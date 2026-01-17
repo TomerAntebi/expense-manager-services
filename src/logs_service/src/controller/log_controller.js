@@ -4,7 +4,7 @@ const removeMongoId = require("../middleware/app_middle_ware");
 const {
   notFoundHandler,
   errorHandler,
-} = require("../middleware/error_middle_ware");
+} = require("../middleware/error_handlers.js");
 const logService = require("../model/log_service");
 
 const logController = Router(); // Create a new logController object
