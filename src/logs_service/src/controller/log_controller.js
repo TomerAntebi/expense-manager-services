@@ -21,7 +21,7 @@ logController.post("/api/add", async (req, res) => {
   res.status(201).json({ ok: true });
 });
 
-logsController.use(notFoundHandler);
-logsController.use(errorHandler);
+logController.use(notFoundHandler);
+logController.use(errorHandler);
 
 module.exports = logController;
