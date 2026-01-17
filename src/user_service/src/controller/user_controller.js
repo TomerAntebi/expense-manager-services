@@ -4,7 +4,7 @@ const requestLogger = require("../middleware/logs_middle_ware");
 const {
   notFoundHandler,
   errorHandler,
-} = require("../middleware/error_middle_ware");
+} = require("../middleware/error_handlers.js");
 const removeMongoId = require("../middleware/app_middle_ware");
 const userService = require("../model/user_service.js");
 const {
