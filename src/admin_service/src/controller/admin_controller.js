@@ -6,16 +6,15 @@ const {
   errorHandler,
 } = require("../middleware/error_handlers.js");
 
-const adminService = require("../model/admin_service");
+const adminService = require("../models/admin_service");
 
 const adminController = Router(); // Create a new adminController object
 adminController.use(requestLogger);
 
 // Define your routes on the 'adminController' instead of 'app'
 adminController.get("/api/about", (req, res) => {
-  console.log("controller");
   const students = adminService.getStudents();
-  res.status(201).json(students);
+  res.status(200).json(students);
 });
 
 adminController.use(notFoundHandler);

@@ -1,12 +1,11 @@
 const { Router } = require("express");
 
 const requestLogger = require("../middleware/logs_middle_ware");
-const removeMongoId = require("../middleware/app_middle_ware");
 const { validateYearAndMonth } = require("../middleware/cost_middle_ware");
 const { notFoundHandler, errorHandler } = require("../middleware/error_handlers");
 
-const costService = require("../model/cost_service");
-const reportService = require("../model/report_service");
+const costService = require("../models/cost_service");
+const reportService = require("../models/report_service");
 
 const costController = Router();
 
@@ -14,7 +13,6 @@ const costController = Router();
  * Global middlewares for this controller
  */
 costController.use(requestLogger);
-costController.use(removeMongoId);
 
 /**
  * GET /api/all
@@ -35,9 +33,7 @@ costController.get("/api/all", async (req, res, next) => {
  */
 costController.post(
   "/api/add",
-  validateYearAndMonth("addCost"),
   async (req, res, next) => {
-    console.log('test1');
     try {
       const newCost = await costService.addCostItem(req.body);
       res.status(201).json(newCost);
@@ -63,6 +59,20 @@ costController.get(
     }
   }
 );
+
+/**
+ * GET /api/total/:userid
+ * Used by the Users service to return `total` for a specific user.
+ */
+costController.get("/api/total/:userid", async (req, res, next) => {
+  try {
+    const userid = Number(req.params.userid);
+    const total = await costService.getTotalCostsForUser(userid);
+    res.status(200).json({ userid, total });
+  } catch (err) {
+    next(err);
+  }
+});
 
 /**
  * Error handling
