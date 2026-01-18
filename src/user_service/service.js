@@ -11,7 +11,7 @@ app.use(express.json());
 connectToDB(process.env.MONGO_URI);
 
 // 2. Mount the router
-app.use("/users", userController);
+app.use("/", userController);
 
 app.get("/", (req, res) => {
   res.send("<p>ello CodeSandbox!<p>");
