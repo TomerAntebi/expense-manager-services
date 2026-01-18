@@ -21,6 +21,3 @@ exports.getAllLogs = async () => {
   return await logModel.find({});
 };
 
-exports.getAllLogsByLevel = async (level) => {
-  return await logModel.find({ level: level });
-};
