@@ -6,13 +6,13 @@
  */
 exports.validateYearAndMonth = (mode = "report") => {
   return (req, res, next) => {
-    console.log('test2');
     // Select source based on request type
     // addCost -> body, report -> query
     const source = mode === "addCost" ? req.body : req.query;
 
     // Normalize input values
-    const userid = Number(source.userid);
+    const rawUserId = source.id !== undefined ? source.id : source.userid;
+    const userid = Number(rawUserId);
     const year = Number(source.year);
     const month = Number(source.month);
 
@@ -21,15 +21,13 @@ exports.validateYearAndMonth = (mode = "report") => {
     validateYear(year);
     validateMonth(month);
 
-    // Business rule for adding costs only
-    if (mode === "addCost") {
-      validateNotPastMonth(year, month);
-    }
-
     // Overwrite original values with validated numbers
     source.userid = userid;
     source.year = year;
     source.month = month;
+    if (source.id !== undefined) {
+      delete source.id;
+    }
 
     // Continue to controller
     next();
@@ -69,17 +67,5 @@ const validateMonth = (month) => {
   }
 };
 
-/**
- * Prevent adding cost items to a past month
- */
-const validateNotPastMonth = (year, month) => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-
-  if (year < currentYear || (year === currentYear && month < currentMonth)) {
-    const err = new Error("Cannot add cost item to a past month");
-    err.statusCode = 400;
-    throw err;
-  }
-};
+// ++c Note: adding costs is validated in the cost service itself. This middleware
+// is used to validate report queries only.

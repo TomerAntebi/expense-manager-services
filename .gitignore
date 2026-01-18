@@ -1,0 +1,33 @@
+# Dependencies
+**/node_modules/
+
+# Environment variables (secrets)
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test output
+**/coverage/
+.nyc_output/
+
+# Build output
+**/dist/
+**/build/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Cursor / local tooling
+.cursor/
+
