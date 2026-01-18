@@ -12,12 +12,12 @@ connectToDB(process.env.MONGO_URI);
 
 // 2. Mount the router
 
-app.use("/logs", logsController);
+app.use("/", logsController);
 
 app.get("/", (req, res) => {
-  res.send("<p>ello CodeSandbox!<p>");
+  res.send("<h1>Log Service!<h1>");
 });
 
 app.listen(port, () => {
-  console.log(`Sandbox listening on port ${port}`);
+  console.log(`Log Service listening on port ${port}`);
 });

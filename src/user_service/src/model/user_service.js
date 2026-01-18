@@ -5,7 +5,7 @@ exports.getAllUsers = async () => {
 };
 
 exports.getUser = async (userId) => {
-  return await userModel.findOne({ id: userId });
+  return await userModel.findOne({ id: userId }); 
 };
 
 exports.addUser = async (userData) => {

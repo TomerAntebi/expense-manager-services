@@ -1,54 +1,87 @@
 // utils/dateParser.js
-const parseDDMMYYYY = (dateString) => {
-  if (!dateString || typeof dateString !== "string") return null;
 
-  const parts = dateString.split("/");
-  if (parts.length !== 3) return null;
+/**
+ * Parse date string in DD/MM/YYYY format
+ */
+const parseDDMMYYYY = (value) => {
+  if (typeof value !== "string") return null;
 
-  const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
-  const year = parseInt(parts[2], 10);
+  const [day, month, year] = value.split("/").map(Number);
+  if (!day || !month || !year) return null;
 
-  const date = new Date(year, month, day);
+  const date = new Date(year, month - 1, day);
 
-  // Check if the date is valid (e.g., prevents 31/02/1999)
-  return isNaN(date.getTime()) ? null : date;
-};
-
-// A reusable middleware function
-exports.parseIdMiddleware = (req, res, next) => {
-  console.log('userId',req.params.id);
-  const parsedId = parseInt(req.params.id, 10);
-  console.log('userId',req.params.id);
-
-
-  if (isNaN(parsedId)) {
-    return res.status(400).json({ error: "ID must be a number" });
+  // Prevent invalid dates like 31/02
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
   }
 
-  // Attach the parsed number back to req so the next function can use it
-  req.params.id = parsedId;
+  return date;
+};
+
+/**
+ * Middleware: parse and validate numeric :id param
+ */
+const parseNumericId = (req, res, next) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    const err = new Error("ID must be a number");
+    err.statusCode = 400;
+    return next(err);
+  }
+
+  req.params.id = id;
   next();
 };
 
-exports.validateAndParseBirthday = (req, res, next) => {
+/**
+ * Middleware: validate and parse birthday from body
+ */
+const parseBirthday = (req, res, next) => {
   const { birthday } = req.body;
 
   if (!birthday) {
-    return res.status(400).json({ error: "Birthday is required" });
+    const err = new Error("Birthday is required");
+    err.statusCode = 400;
+    return next(err);
   }
 
   const parsedDate = parseDDMMYYYY(birthday);
 
   if (!parsedDate) {
-    return res
-      .status(400)
-      .json({ error: "Invalid date format. Expected DD/MM/YYYY" });
+    const err = new Error("Invalid date format. Expected DD/MM/YYYY");
+    err.statusCode = 400;
+    return next(err);
   }
 
-  // Overwrite the string with the real Date object for the next functions
   req.body.birthday = parsedDate;
-
-  // Move to the next function (the controller)
   next();
+};
+
+
+/**
+ * Check if given year/month is in the past
+ */
+const isPastMonth = (year, month) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  return (
+    year < currentYear ||
+    (year === currentYear && month < currentMonth)
+  );
+};
+
+
+module.exports = {
+  parseDDMMYYYY,
+  parseNumericId,
+  parseBirthday,
+  isPastMonth,
 };

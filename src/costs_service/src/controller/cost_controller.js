@@ -1,64 +1,72 @@
 const { Router } = require("express");
+
 const requestLogger = require("../middleware/logs_middle_ware");
-const {notFoundHandler,errorHandler} = require("../middleware/error_handlers.js");
 const removeMongoId = require("../middleware/app_middle_ware");
 const { validateYearAndMonth } = require("../middleware/cost_middle_ware");
+const { notFoundHandler, errorHandler } = require("../middleware/error_handlers");
 
 const costService = require("../model/cost_service");
 const reportService = require("../model/report_service");
 
-const costController = Router(); // Create a new Router object
+const costController = Router();
+
+/**
+ * Global middlewares for this controller
+ */
 costController.use(requestLogger);
 costController.use(removeMongoId);
 
-// controllers/cost.controller.js
-costController.get("/api/all", async (req, res) => {
+/**
+ * GET /api/all
+ * Get all cost items
+ */
+costController.get("/api/all", async (req, res, next) => {
   try {
     const costs = await costService.getAllCosts();
-
     res.status(200).json(costs);
-  } catch (error) {
-    res.status(500).json({
-      error: error.message,
-    });
+  } catch (err) {
+    next(err);
   }
 });
 
+/**
+ * POST /api/add
+ * Add new cost item
+ */
 costController.post(
   "/api/add",
   validateYearAndMonth("addCost"),
-  async (req, res) => {
+  async (req, res, next) => {
+    console.log('test1');
     try {
-      if (!req.body) {
-        return res.status(400).json({ error: "Missing request body" });
-      }
-
       const newCost = await costService.addCostItem(req.body);
-
       res.status(201).json(newCost);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
 
+/**
+ * GET /api/report
+ * Get monthly report
+ */
 costController.get(
   "/api/report",
   validateYearAndMonth("report"),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const report = await reportService.getReport(req.query);
-
-      if (!report) {
-        return res.status(404).json({ error: "Report not found" });
-      }
-
-      res.status(201).json(report);
+      res.status(200).json(report);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
 );
+
+/**
+ * Error handling
+ */
 costController.use(notFoundHandler);
 costController.use(errorHandler);
 

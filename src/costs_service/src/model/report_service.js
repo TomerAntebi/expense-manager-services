@@ -1,36 +1,30 @@
 const reportModel = require("./report_schema");
 const costService = require("./cost_service");
-const { validateUserExists } = require("../utils/use_check_user");
+const { validateUserExists } = require("../utils/validate_user");
+const { isPastMonth } = require("../utils/helpers");
 
-const createReport = async (report) => {
-  return await reportModel.create(report);
-};
-
+/**
+ * Get monthly report
+ * Uses cache if exists
+ * Persists report only for past months
+ */
 exports.getReport = async ({ userid, year, month }) => {
-  const exists = await validateUserExists(userid);
-  if (!exists) {
-    throw new Error("User does not exist");
+  const userExists = await validateUserExists(userid);
+  if (!userExists) {
+    const err = new Error("User does not exist");
+    err.statusCode = 404;
+    throw err;
   }
 
-  const cachedReport = await reportModel.findOne({
-    userid,
-    year,
-    month,
-  });
-
+  const cachedReport = await reportModel.findOne({ userid, year, month });
   if (cachedReport) {
     return cachedReport;
   }
 
   const report = await costService.calculateReport(userid, year, month);
 
-  const now = new Date();
-  const isPast =
-    year < now.getFullYear() ||
-    (year === now.getFullYear() && month < now.getMonth() + 1);
-
-  if (isPast) {
-    await createReport(report);
+  if (isPastMonth(year, month)) {
+    await reportModel.create(report);
   }
 
   return report;
