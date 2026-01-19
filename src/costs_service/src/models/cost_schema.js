@@ -41,7 +41,8 @@ const costSchema = new Schema(
       min: 1,
     },
 
-    createdAt: {
+    // ++c Cost date/time (if not provided, server uses request time)
+    date: {
       type: Date,
       default: Date.now,
     },
@@ -65,7 +66,8 @@ const costSchema = new Schema(
   }
 );
 
-costSchema.index({ userid: 1, createdAt: 1 });
+// ++c Optimize monthly queries and reports
+costSchema.index({ userid: 1, date: 1 });
 
 /* ++c Export the Mongoose model */
 module.exports = model("Cost", costSchema, "costs");

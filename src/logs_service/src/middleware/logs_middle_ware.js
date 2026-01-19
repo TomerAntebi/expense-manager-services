@@ -3,7 +3,7 @@
  Request logging middleware for the Logs service itself.
  Requirement: write a log entry for every HTTP request + endpoint access.
 */
-const sendLogToDB = require("../utils/add_log_to_db");
+const forwardLog = require("../utils/forward_log");
 
 const requestLogger = (req, res, next) => {
   // ++c Track request duration
@@ -17,7 +17,7 @@ const requestLogger = (req, res, next) => {
         statusCode: res.statusCode,
         durationMs: Date.now() - startTime,
       };
-      sendLogToDB(logData);
+      forwardLog(logData);
     }
   });
 

@@ -7,6 +7,10 @@ const app = require("../app");
  Unit test for the Developers Team endpoint required by the project:
  - GET /api/about
  Must return only first_name and last_name for each team member.
+
+ Rules validated by this file:
+ - /api/about does not depend on DB (team members are hardcoded / env-based)
+ - Error replies are formatted as {id, message}
 */
 
 describe("Admin/About service API", () => {
@@ -18,6 +22,7 @@ describe("Admin/About service API", () => {
   });
 
   test("GET /api/about returns only first_name and last_name", async () => {
+    // ++c Requirement: return only first_name + last_name (no extra fields)
     const response = await request(app).get("/api/about");
     expect(response.statusCode).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
@@ -28,6 +33,7 @@ describe("Admin/About service API", () => {
   });
 
   test("Unknown route returns 404 {id,message}", async () => {
+    // ++c Requirement: errors include id + message
     const response = await request(app).get("/api/does-not-exist");
     expect(response.statusCode).toBe(404);
     expect(response.body).toEqual({

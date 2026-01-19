@@ -38,8 +38,8 @@ exports.getTotalCostsForUser = async (userid) => {
  * Business rules enforced here
  */
 exports.addCostItem = async (costData) => {
-  const { userid, sum, category, createdAt } = costData;
-  const createdAtDate = createdAt ? new Date(createdAt) : null;
+  const { userid, sum, category, date } = costData;
+  const parsedCostDate = date ? new Date(date) : null;
 
   if (!Number.isInteger(userid)) {
     const err = new Error("userid must be an integer");
@@ -65,16 +65,17 @@ exports.addCostItem = async (costData) => {
     throw err;
   }
 
-  if (createdAtDate) {
-    if (Number.isNaN(createdAtDate.getTime())) {
-      const err = new Error("Invalid createdAt");
+  // ++c Optional date validation (if date is provided)
+  if (parsedCostDate) {
+    if (Number.isNaN(parsedCostDate.getTime())) {
+      const err = new Error("Invalid date");
       err.statusCode = 400;
       throw err;
     }
 
     // Server doesn't allow adding costs with dates belonging to the past.
     // We enforce this at the month granularity to keep reports cacheable.
-    if (isPastMonth(createdAtDate.getFullYear(), createdAtDate.getMonth() + 1)) {
+    if (isPastMonth(parsedCostDate.getFullYear(), parsedCostDate.getMonth() + 1)) {
       const err = new Error("Cannot add cost item to a past month");
       err.statusCode = 400;
       throw err;
@@ -88,10 +89,11 @@ exports.addCostItem = async (costData) => {
     throw err;
   }
 
-  if (createdAtDate) {
-    return costModel.create({ ...costData, createdAt: createdAtDate });
+  if (parsedCostDate) {
+    return costModel.create({ ...costData, date: parsedCostDate });
   }
 
+  // ++c No date provided -> schema default applies automatically
   return costModel.create(costData);
 };
 
@@ -106,7 +108,7 @@ exports.calculateReport = async (userid, year, month) => {
     {
       $match: {
         userid,
-        createdAt: {
+        date: {
           $gte: startOfMonth,
           $lt: endOfMonth,
         },
@@ -119,7 +121,7 @@ exports.calculateReport = async (userid, year, month) => {
           $push: {
             sum: "$sum",
             description: "$description",
-            day: { $dayOfMonth: "$createdAt" },
+            day: { $dayOfMonth: "$date" },
           },
         },
       },

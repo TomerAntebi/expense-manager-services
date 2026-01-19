@@ -11,6 +11,11 @@ const User = require("../src/models/user_schema");
  - POST /api/add
  - GET /api/users
  - GET /api/users/:id (must include `total`)
+
+ Rules validated by this file:
+ - Error replies are formatted as {id, message}
+ - Birthday input is validated (strict DD/MM/YYYY)
+ - User details endpoint returns total costs (computed via Costs service)
 */
 
 describe("Users service API", () => {
@@ -48,6 +53,7 @@ describe("Users service API", () => {
   });
 
   test("POST /api/add adds a new user", async () => {
+    // ++c Required fields: id, first_name, last_name, birthday
     const response = await request(app).post("/api/add").send({
       id: 123123,
       first_name: "mosh",
@@ -64,6 +70,7 @@ describe("Users service API", () => {
   });
 
   test("POST /api/add rejects missing birthday", async () => {
+    // ++c Validation required by project
     const response = await request(app).post("/api/add").send({
       id: 123123,
       first_name: "mosh",
@@ -78,6 +85,7 @@ describe("Users service API", () => {
   });
 
   test("POST /api/add rejects invalid birthday date (strict DD/MM/YYYY)", async () => {
+    // ++c Strict validation rejects invalid calendar dates like 31/02
     const response = await request(app).post("/api/add").send({
       id: 123123,
       first_name: "mosh",
@@ -93,6 +101,7 @@ describe("Users service API", () => {
   });
 
   test("GET /api/users lists all users", async () => {
+    // ++c Requirement: list users with same fields as users collection
     await User.create({
       id: 123123,
       first_name: "mosh",
@@ -114,6 +123,7 @@ describe("Users service API", () => {
   });
 
   test("GET /api/users/:id returns user details including total", async () => {
+    // ++c Requirement: reply includes first_name, last_name, id, total
     await User.create({
       id: 123123,
       first_name: "mosh",
@@ -132,6 +142,7 @@ describe("Users service API", () => {
   });
 
   test("GET /api/users/:id rejects invalid id", async () => {
+    // ++c Validation: id param must be numeric
     const response = await request(app).get("/api/users/abc");
     expect(response.statusCode).toBe(400);
     expect(response.body).toEqual({
@@ -141,6 +152,7 @@ describe("Users service API", () => {
   });
 
   test("GET /api/users/:id returns 404 when user not found", async () => {
+    // ++c User not found => 404 error from service layer
     const response = await request(app).get("/api/users/999");
     expect(response.statusCode).toBe(404);
     expect(response.body).toEqual({
@@ -150,6 +162,7 @@ describe("Users service API", () => {
   });
 
   test("GET /api/users/:id returns 500 when Costs service fails", async () => {
+    // ++c total is fetched from Costs service; dependency failure => 500
     await User.create({
       id: 123123,
       first_name: "mosh",
@@ -176,6 +189,7 @@ describe("Users service API", () => {
   });
 
   test("Unknown route returns 404 {id,message}", async () => {
+    // ++c Requirement: errors include id + message
     const response = await request(app).get("/api/does-not-exist");
     expect(response.statusCode).toBe(404);
     expect(response.body).toEqual({
