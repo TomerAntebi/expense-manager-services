@@ -11,8 +11,8 @@ exports.validateYearAndMonth = (mode = "report") => {
     const source = mode === "addCost" ? req.body : req.query;
 
     // Normalize input values
-    const rawUserId = source.id !== undefined ? source.id : source.userid;
-    const userid = Number(rawUserId);
+    const userIdInput = source.id !== undefined ? source.id : source.userid;
+    const userid = Number(userIdInput);
     const year = Number(source.year);
     const month = Number(source.month);
 
@@ -51,6 +51,12 @@ const validateUserId = (userid) => {
 const validateYear = (year) => {
   if (!Number.isInteger(year)) {
     const err = new Error("Year must be an integer");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (year < 1900) {
+    const err = new Error("Year must be >= 1900");
     err.statusCode = 400;
     throw err;
   }

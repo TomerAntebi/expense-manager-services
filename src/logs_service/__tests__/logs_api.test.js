@@ -10,6 +10,10 @@ const Log = require("../src/models/log_schema");
  Unit tests for the Logs service endpoints required by the project:
  - POST /api/add
  - GET /api/logs
+
+ Rules validated by this file:
+ - Logs are persisted to MongoDB via Logs service
+ - Error replies are formatted as {id, message}
 */
 
 describe("Logs service API", () => {
@@ -31,6 +35,7 @@ describe("Logs service API", () => {
   });
 
   test("POST /api/add stores a log", async () => {
+    // ++c This endpoint is called by other services to store logs in DB
     const response = await request(app).post("/api/add").send({
       request: "GET /api/logs",
       statusCode: 200,
@@ -52,6 +57,7 @@ describe("Logs service API", () => {
   });
 
   test("GET /api/logs returns stored logs", async () => {
+    // ++c Requirement: return a JSON document describing all logs
     await Log.create({
       level: "info",
       request: "GET /x",
@@ -71,6 +77,7 @@ describe("Logs service API", () => {
   });
 
   test("Unknown route returns 404 {id,message}", async () => {
+    // ++c Requirement: errors include id + message
     const response = await request(app).get("/api/does-not-exist");
     expect(response.statusCode).toBe(404);
     expect(response.body).toEqual({

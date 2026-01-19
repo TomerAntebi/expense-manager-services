@@ -3,7 +3,8 @@
  Utility used by middleware/error handlers to forward logs to Logs service.
  Requirement: logs should be saved to MongoDB (handled by logs_service).
 */
-const sendLogToDB = async (logData) => {
+
+const forwardLog = async (logData) => {
   try {
     // ++c Forward to Logs service endpoint (POST)
     await fetch(process.env.LOG_SERVICE_URL, {
@@ -19,4 +20,5 @@ const sendLogToDB = async (logData) => {
   }
 };
 
-module.exports = sendLogToDB;
+module.exports = forwardLog;
+

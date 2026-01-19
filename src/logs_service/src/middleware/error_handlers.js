@@ -4,7 +4,7 @@
  Requirement: error replies must include at least {id, message}.
  In addition, we persist internal errors as logs.
 */
-const sendLogToDB = require("../utils/add_log_to_db");
+const forwardLog = require("../utils/forward_log");
 
 // ++c 404 handler for unknown routes
 exports.notFoundHandler = (req, res, next) => {
@@ -23,7 +23,7 @@ exports.errorHandler = (err, req, res, next) => {
     durationMs: 0,
     error: err.message,
   };
-  sendLogToDB(logData);
+  forwardLog(logData);
 
   // ++c Error response format required by project
   res.status(status).json({
