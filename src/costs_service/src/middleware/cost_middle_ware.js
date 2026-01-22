@@ -33,7 +33,6 @@ exports.validateYearAndMonth = (mode = "report") => {
     next();
   };
 };
-
 /**
  * Validate user id
  */
@@ -55,11 +54,6 @@ const validateYear = (year) => {
     throw err;
   }
 
-  if (year < 1900) {
-    const err = new Error("Year must be >= 1900");
-    err.statusCode = 400;
-    throw err;
-  }
 };
 
 /**
@@ -75,3 +69,4 @@ const validateMonth = (month) => {
 
 // ++c Note: adding costs is validated in the cost service itself. This middleware
 // is used to validate report queries only.
+
