@@ -10,9 +10,34 @@ const { Schema,model } = require("mongoose");
 
 const reportSchema = new Schema(
   {
-    userid: { type: Number, required: true },
-    year: { type: Number, required: true },
-    month: { type: Number, required: true },
+    userid: {
+      type: Number,
+      required: true,
+      // ++c Keep consistency with other collections (userid is an integer)
+      validate: {
+        validator: Number.isInteger,
+        message: "userid must be an integer",
+      },
+    },
+    year: {
+      type: Number,
+      required: true,
+      min: 1900,
+      validate: {
+        validator: Number.isInteger,
+        message: "Year must be an integer",
+      },
+    },
+    month: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 12,
+      validate: {
+        validator: Number.isInteger,
+        message: "Month must be an integer between 1 and 12",
+      },
+    },
     costs: { type: Array, required: true },
   },
   {
