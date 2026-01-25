@@ -55,7 +55,7 @@ Live URL:
 https://user-services-fqb9.onrender.com
 
 Example:
-GET https://user-services-fqb9.onrender.com/api/all
+GET https://user-services-fqb9.onrender.com/api/users
 
 ---
 
