@@ -55,7 +55,7 @@ Live URL:
 https://user-services-fqb9.onrender.com
 
 Example:
-GET https://user-services-fqb9.onrender.com/users/api/all
+GET https://user-services-fqb9.onrender.com/api/all
 
 ---
 
@@ -66,13 +66,13 @@ Handles expense records and generates monthly cost reports.
 
 Main endpoints:
 POST /costs/api/add  
-GET /costs/api/report?userid=&year=&month=  
+GET api/report?userid=&year=&month=  
 
 Live URL:
 https://cost-service-1d44.onrender.com
 
 Example:
-GET https://cost-service-1d44.onrender.com/costs/api/report?userid=12334&year=2026&month=1
+GET https://cost-service-1d44.onrender.com/api/report?userid=12334&year=2026&month=1
 
 ---
 
@@ -100,7 +100,7 @@ POST /logs/api/add
 GET /logs/api/all  
 
 Live URL:
-https://log-service-1oo2.onrender.com
+https://log-service-1oo2.onrender.com/api/logs
 
 ---
 
